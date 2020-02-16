@@ -1,5 +1,24 @@
 <html>
-<head><title>Attendance</title></head>
+<head>
+    <title>Attendance</title>
+<meta charset="UTF-8"/>
+<style>
+    button, input{
+        width:100%;
+        padding:10px;
+        margin-bottom: 10px;
+    }
+
+    .register-button{
+        padding:40px;
+    }
+    td[data-precent="true"]{
+        background: green;
+    } td[data-precent="false"]{
+        background: red;
+    }
+</style>
+</head>
 <body>
     <div>
         <button onclick="showStudents()" type="button">Show students</button> 
@@ -7,13 +26,20 @@
         <button onclick="registerAttendance()" type="button">Register attendance</button> 
     </div>
     <article id="students">
+<input name="new-student"/>
+<button onclick="addStudent()" type="button">Add</button>
+<ul id="student-list">
+    
+</ul>
+<button type="button" onclick="clearData()">Clear students and attendance</button>
 
     </article>
-    <article id="participation">
-
-    </article>
+    <article id="attendance">
+  </article>
     <article id="register">
-
+        <h1  id="student-name"></h1>
+        <button class="register-button" onclick="currentStudentPrecent()" type="button">Precent</button>
+        <button class="register-button" onclick="currentStudentMia()" type="button">MIA</button>
     </article>
     <script src="https://browser.sentry-cdn.com/5.12.1/bundle.min.js" integrity="sha384-y+an4eARFKvjzOivf/Z7JtMJhaN6b+lLQ5oFbBbUwZNNVir39cYtkjW1r6Xjbxg3" crossorigin="anonymous">
     </script>
@@ -21,7 +47,151 @@
 
     <script>
 Sentry.init({ dsn: 'https://6e6284da05c7435b859da71ae4b3094e@sentry.io/2572820' });
-    myUndefinedFunction();
+var STUDENTS = document.getElementById("students");
+var ATTENDANCE = document.getElementById("attendance");
+var REGISTER = document.getElementById("register");
+var STUDENTLIST = document.getElementById("student-list");
+var NEWSTUDENTNAME = document.getElementsByName("new-student")[0];
+var CURRENTSTUDENTNAME = document.getElementById("student-name");
+
+function hideAll(){
+    STUDENTS.style.display = "none";
+ATTENDANCE.style.display = "none";
+REGISTER.style.display = "none";
+}
+
+var _storage  = JSON.parse( localStorage.getItem('attendance'));
+if(_storage === null){
+    _storage = {
+        students :[],
+        dates: []
+    }
+}
+
+console.log(_storage)
+
+var _currentStudentIndex = 0;
+var _currentAttendanceDate = null;
+
+function save(){
+    localStorage.setItem('attendance', JSON.stringify(_storage));
+
+}
+
+hideAll()
+
+function showStudents(){
+    hideAll()
+    STUDENTS.style.display= "block"
+    drawStudentList();
+
+}
+function showAttendance(){
+    hideAll()
+    ATTENDANCE.style.display= "block"
+     ""
+     var html = "<table>";
+        html += "<tr><td>student</td>";
+    for(var i = 0;i < _storage.dates.length; i++){
+        var date = new Date(_storage.dates[i]);
+        html += `<td>${date.getDate()}.${date.getMonth() + 1}</td>`;
+    }
+
+    html += "</tr>";
+
+    for( var s = 0; s < _storage.students.length; s++){
+        var student = _storage.students[s];
+        html += "<tr>";
+            html += `<td>${student.name}</td>`;
+
+    for(var d = 0;d < _storage.dates.length; d++){
+        html += `<td data-precent="${student[_storage.dates[d]] ? "true" : "false"}">${student[_storage.dates[d]] ? "x" : "-"}</td>`;
+    }
+
+    html += "</tr>";
+    }
+    html += "</table>";
+
+    ATTENDANCE.innerHTML = html;
+}
+function registerAttendance(){
+    hideAll()
+    REGISTER.style.display= "block"
+    _currentStudentIndex = 0;
+ _currentAttendanceDate = Date.now();
+ CURRENTSTUDENTNAME.innerHTML = _storage.students[_currentStudentIndex].name;
+
+}
+
+function addStudent(){
+    if(NEWSTUDENTNAME.value === "") return;
+    _storage.students.push({name: NEWSTUDENTNAME.value})
+    NEWSTUDENTNAME.value = ""
+    save();
+    drawStudentList();
+}
+
+function drawStudentList(){
+    STUDENTLIST.innerHTML = ""
+    for(var i = 0;i < _storage.students.length; i++){
+        STUDENTLIST.innerHTML += `<li>${_storage.students[i].name}</li>` 
+    }
+}
+
+function currentStudentPrecent(){
+    if(_currentStudentIndex === 0){
+        _storage.dates.push(_currentAttendanceDate)
+    }
+    _storage.students[_currentStudentIndex][_currentAttendanceDate] = true;
+    _currentStudentIndex++;
+    save();
+
+
+    if(_storage.students.length === _currentStudentIndex){
+        showAttendance();
+        return;
+    }
+
+ CURRENTSTUDENTNAME.innerHTML = _storage.students[_currentStudentIndex].name;
+
+}
+
+function currentStudentMia(){
+    if(_currentStudentIndex === 0){
+        _storage.dates.push(_currentAttendanceDate)
+    }
+    _storage.students[_currentStudentIndex][_currentAttendanceDate] = false;
+  
+
+    _currentStudentIndex++;
+    save();
+
+
+    if(_storage.students.length === _currentStudentIndex){
+        showAttendance();
+        return;
+    }
+
+ CURRENTSTUDENTNAME.innerHTML = _storage.students[_currentStudentIndex].name;
+
+
+    
+}
+
+function clearData(){
+    console.log("clear")
+    var concent = confirm("Are you sure you will delete your students and all attendence data?");
+    if(concent){
+    localStorage.setItem('attendance', null);
+    hideAll();
+    _storage = {
+        students :[],
+        dates: []
+    }
+
+    }
+}
+
     </script>
 </body>
 </html>
