@@ -12,9 +12,9 @@
     .register-button{
         padding:40px;
     }
-    td[data-precent="true"]{
+    td[data-present="true"]{
         background: green;
-    } td[data-precent="false"]{
+    } td[data-present="false"]{
         background: red;
     }
 </style>
@@ -38,7 +38,7 @@
   </article>
     <article id="register">
         <h1  id="student-name"></h1>
-        <button class="register-button" onclick="currentStudentPrecent()" type="button">Precent</button>
+        <button class="register-button" onclick="currentStudentPresent()" type="button">Present</button>
         <button class="register-button" onclick="currentStudentMia()" type="button">MIA</button>
     </article>
     <script src="https://browser.sentry-cdn.com/5.12.1/bundle.min.js" integrity="sha384-y+an4eARFKvjzOivf/Z7JtMJhaN6b+lLQ5oFbBbUwZNNVir39cYtkjW1r6Xjbxg3" crossorigin="anonymous">
@@ -105,7 +105,7 @@ function showAttendance(){
             html += `<td>${student.name}</td>`;
 
     for(var d = 0;d < _storage.dates.length; d++){
-        html += `<td data-precent="${student[_storage.dates[d]] ? "true" : "false"}">${student[_storage.dates[d]] ? "x" : "-"}</td>`;
+        html += `<td data-present="${student[_storage.dates[d]] ? "true" : "false"}">${student[_storage.dates[d]] ? "x" : "-"}</td>`;
     }
 
     html += "</tr>";
@@ -138,7 +138,7 @@ function drawStudentList(){
     }
 }
 
-function currentStudentPrecent(){
+function currentStudentPresent(){
     if(_currentStudentIndex === 0){
         _storage.dates.push(_currentAttendanceDate)
     }
@@ -179,7 +179,6 @@ function currentStudentMia(){
 }
 
 function clearData(){
-    console.log("clear")
     var concent = confirm("Are you sure you will delete your students and all attendence data?");
     if(concent){
     localStorage.setItem('attendance', null);
